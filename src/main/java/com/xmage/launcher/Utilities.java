@@ -51,30 +51,6 @@ public class Utilities {
         return OS.UNKNOWN;
     }
 
-    public static String getArch() {
-        String arch = System.getenv("PROCESSOR_ARCHITECTURE");
-        String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-
-        return arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? "64" : "32";
-    }
-
-    public static String getOSandArch() {
-        String OS_arch = "windows-i586";
-        switch (getOS()) {
-            case WIN:
-                OS_arch = "windows-" + (getArch().equals("64") ? "x64" : "i586");
-                break;
-            case OSX:
-                OS_arch = "macosx-x64";
-                break;
-            case NIX:
-                String arch = System.getProperty("os.arch");
-                OS_arch = "linux-" + (arch.startsWith("i") ? "i586" : "x64"); // assume arch is same as jvm arch
-                break;
-        }
-        return OS_arch;
-    }
-
     public static JSONObject readJsonFromUrl(URL url) throws IOException, JSONException {
         // redirect support (example: from http to https)
         URLConnection connection = url.openConnection();
@@ -123,14 +99,7 @@ public class Utilities {
     private static Process launchProcess(String main, String args, String path, String javaOpts) {
 
         File installPath = Utilities.getInstallPath();
-        File javaHome;
-        if (Config.getInstance().useSystemJava()) {
-            javaHome = new File(System.getProperty("java.home"));
-        } else if (getOS() == OS.OSX) {
-            javaHome = new File(installPath, "/java/jre" + Config.getInstance().getInstalledJavaVersion() + ".jre/Contents/Home");
-        } else {
-            javaHome = new File(installPath, "/java/jre" + Config.getInstance().getInstalledJavaVersion());
-        }
+        File javaHome = new File(System.getProperty("java.home"));
         File javaBin = new File(javaHome, "/bin/java");
         File xmagePath = new File(installPath, "/xmage/" + path);
         File classPath = new File(xmagePath, "/lib/*");

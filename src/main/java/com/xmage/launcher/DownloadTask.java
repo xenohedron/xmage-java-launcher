@@ -1,11 +1,8 @@
 package com.xmage.launcher;
 
 import com.xmage.launcher.DownloadTask.Progress;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,77 +94,6 @@ public abstract class DownloadTask extends SwingWorker<Void, Progress> {
         }
     }
 
-    protected void extract(File from, File to) throws IOException {
-
-        TarArchiveInputStream tarIn = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(from)));
-
-        // first calculate the aggregate size for displaying progress
-        publish(0);
-        TarArchiveEntry tarEntry;
-        long size = 0;
-        while ((tarEntry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-            size += tarEntry.getSize();
-        }
-        tarIn.close();
-
-        // now write out the files
-        long total = 0;
-        tarIn = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(from)));
-        while ((tarEntry = (TarArchiveEntry) tarIn.getNextEntry()) != null) {
-            File destPath = new File(to, tarEntry.getName());
-            int mode = tarEntry.getMode();
-            if (tarEntry.isDirectory()) {
-                destPath.mkdirs();
-            } else {
-                destPath.createNewFile();
-                byte[] data = new byte[BUFFER_SIZE];
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destPath), BUFFER_SIZE);
-                int count;
-                while ((count = tarIn.read(data, 0, BUFFER_SIZE)) != -1) {
-                    out.write(data, 0, count);
-                }
-                out.close();
-                total += tarEntry.getSize();
-                publish((int) (total * 100 / size));
-            }
-            setFilePermissions(destPath, mode);
-        }
-        tarIn.close();
-
-    }
-
-    private static final int OWNER_READ = 256;
-    private static final int OWNER_WRITE = 128;
-    private static final int OWNER_EXEC = 64;
-
-    private static final int EVERYONE_READ = 4;
-    private static final int EVERYONE_WRITE = 2;
-    private static final int EVERYONE_EXEC = 1;
-
-    private void setFilePermissions(File file, int mode) {
-        if ((mode & EVERYONE_READ) == EVERYONE_READ) {
-            file.setReadable(true, false);
-        } else if ((mode & OWNER_READ) == OWNER_READ) {
-            file.setReadable(true, true);
-        } else {
-            file.setReadable(false, false);
-        }
-        if ((mode & EVERYONE_WRITE) == EVERYONE_WRITE) {
-            file.setWritable(true, false);
-        } else if ((mode & OWNER_WRITE) == OWNER_WRITE) {
-            file.setWritable(true, true);
-        } else {
-            file.setWritable(false, false);
-        }
-        if ((mode & EVERYONE_EXEC) == EVERYONE_EXEC) {
-            file.setExecutable(true, false);
-        } else if ((mode & OWNER_EXEC) == OWNER_EXEC) {
-            file.setExecutable(true, true);
-        } else {
-            file.setExecutable(false, false);
-        }
-    }
-
     protected void unzip(File from, File to) throws IOException {
 
         ZipArchiveInputStream zipIn = new ZipArchiveInputStream(new FileInputStream(from));
@@ -176,7 +102,7 @@ public abstract class DownloadTask extends SwingWorker<Void, Progress> {
         publish(0);
         ZipArchiveEntry zipEntry;
         long size = 0;
-        while ((zipEntry = (ZipArchiveEntry) zipIn.getNextEntry()) != null) {
+        while ((zipEntry = zipIn.getNextEntry()) != null) {
             size += zipEntry.getSize();
         }
         zipIn.close();
@@ -184,7 +110,7 @@ public abstract class DownloadTask extends SwingWorker<Void, Progress> {
         // now write out the files
         long total = 0;
         zipIn = new ZipArchiveInputStream(new FileInputStream(from));
-        while ((zipEntry = (ZipArchiveEntry) zipIn.getNextEntry()) != null) {
+        while ((zipEntry = zipIn.getNextEntry()) != null) {
             File destPath = new File(to, zipEntry.getName());
             if (zipEntry.isDirectory()) {
                 destPath.mkdirs();

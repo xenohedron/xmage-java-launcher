@@ -17,7 +17,6 @@ public class SettingsDialog extends JDialog {
     private final JTextField txtXMageHome;
     private final JCheckBox chkShowClientConsole;
     private final JCheckBox chkShowServerConsole;
-    private final JCheckBox chkUseSystemJava;
     private final JCheckBox chkServerTestMode;
     private final JSpinner spnGuiSize;
     private final JSpinner spnClientDelay;
@@ -184,19 +183,6 @@ public class SettingsDialog extends JDialog {
         constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
 
-        label = new JLabel("Use system Java:");
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.NONE;
-        panel2.add(label, constraints);
-
-        chkUseSystemJava = new JCheckBox();
-        chkUseSystemJava.setFont(defaultFont);
-        chkUseSystemJava.setSelected(Config.getInstance().useSystemJava());
-        constraints.gridwidth = GridBagConstraints.REMAINDER;
-        constraints.fill = GridBagConstraints.BOTH;
-        panel2.add(chkUseSystemJava, constraints);
-
         label = new JLabel("Client java options:");
         constraints.anchor = GridBagConstraints.EAST;
         constraints.gridwidth = 1;
@@ -283,7 +269,6 @@ public class SettingsDialog extends JDialog {
         Config.getInstance().setShowClientConsole(this.chkShowClientConsole.isSelected());
         Config.getInstance().setShowServerConsole(this.chkShowServerConsole.isSelected());
         Config.getInstance().setGuiSize((Integer) this.spnGuiSize.getValue());
-        Config.getInstance().setUseSystemJava(this.chkUseSystemJava.isSelected());
         Config.getInstance().setServerTestMode(this.chkServerTestMode.isSelected());
         Config.getInstance().setClientStartDelaySeconds((Integer) this.spnClientDelay.getValue());
         Config.getInstance().saveProperties();

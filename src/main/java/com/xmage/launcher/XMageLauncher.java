@@ -49,11 +49,8 @@ public class XMageLauncher implements Runnable {
     private final List<Process> clientProcesses = new LinkedList<>();
     private final XMageConsole serverConsole;
     private final XMageConsole clientConsole;
-    private boolean newJava = false;
-    private boolean noJava = false;
     private boolean newXMage = false;
     private boolean noXMage = false;
-    private boolean downgradeXMage = false;
 
     private XMageLauncher() {
         setDefaultFonts();
@@ -290,11 +287,8 @@ public class XMageLauncher implements Runnable {
             settings.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
-                    checkJava();
-                    if (!noJava && !noXMage) {
+                    if (!noXMage) {
                         enableButtons();
-                    } else if (noJava) {
-                        handleUpdate();
                     }
                 }
             });
@@ -323,7 +317,6 @@ public class XMageLauncher implements Runnable {
     }
 
     private void handleClient() {
-        checkJava();
         Process p = Utilities.launchClientProcess();
         if (p == null) {
             disableButtons(true);
@@ -337,7 +330,6 @@ public class XMageLauncher implements Runnable {
 
     private void handleServer() {
         if (serverProcess == null) {
-            checkJava();
             if (Config.getInstance().isServerTestMode()) {
                 textArea.append(messages.getString("launchServer.testMode.message") + "\n");
             }
@@ -390,7 +382,7 @@ public class XMageLauncher implements Runnable {
             return;
         }
         checkXMage(true); // handle branch changes
-        if (!newJava && !newXMage) {
+        if (!newXMage) {
             int response = JOptionPane.showConfirmDialog(frame, messages.getString("force.update.message"), messages.getString("force.update.title"), JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
                 UpdateTask update = new UpdateTask(progressBar, true);
@@ -407,14 +399,13 @@ public class XMageLauncher implements Runnable {
     private void handleCheckUpdates() {
         if (getConfig()) {
             checkUpdates();
-            if (!newJava && !newXMage) {
+            if (!newXMage) {
                 JOptionPane.showMessageDialog(frame, messages.getString("xmage.latest.message"), messages.getString("xmage.latest.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
 
     private void checkUpdates() {
-        checkJava();
         checkXMage(false);
         enableButtons();
     }
@@ -487,88 +478,6 @@ public class XMageLauncher implements Runnable {
         return false;
     }
 
-    private boolean checkJavaFX() {
-        return true; // JavaFX is not currently needed.
-//        try {
-//            Class.forName("javafx.application.Platform");
-//            return true;
-//        } catch( ClassNotFoundException e ) {
-//            return false;
-//        }
-    }
-
-    private void checkJava() {
-        if (Config.getInstance().useSystemJava()) {
-            // checks if the system java is suitable for XMage
-            // as it is selected in the configuration (user settings)
-            textArea.append(messages.getString("java.installed") + System.getProperty("java.home") + "\n");
-            if (checkJavaFX()) {
-                noJava = false;
-                return;
-            }
-            JOptionPane.showMessageDialog(frame, messages.getString("java.system.nojavafx.message"),
-                    messages.getString("java.system.nojavafx"),
-                    JOptionPane.ERROR_MESSAGE);
-            Config.getInstance().setUseSystemJava(false);
-            Config.getInstance().saveProperties();
-        }
-        try {
-            // checks if the currently installed java version is up-to-date
-            String javaAvailableVersion = (String) config.getJSONObject("java").get(("version"));
-            String javaInstalledVersion = Config.getInstance().getInstalledJavaVersion();
-            textArea.append(messages.getString("java.installed") + javaInstalledVersion + "\n");
-            textArea.append(messages.getString("java.available") + javaAvailableVersion + "\n");
-            noJava = false;
-            newJava = false;
-            if (compareVersions(javaAvailableVersion, javaInstalledVersion) > 0) {
-                newJava = true;
-                String javaMessage;
-                String javaTitle;
-                // it could be that XMage java isn't installed yet
-                if (javaInstalledVersion.isEmpty()) {
-                    noJava = true;
-                    textArea.append(messages.getString("java.none") + "\n");
-                    javaMessage = messages.getString("java.none.message");
-                    javaTitle = messages.getString("java.none");
-                } else {
-                    textArea.append(messages.getString("java.new") + "\n");
-                    javaMessage = messages.getString("java.new.message");
-                    javaTitle = messages.getString("java.new");
-                }
-                // prompt the users to select which java they want to use
-                int result = JOptionPane.showOptionDialog(frame, javaMessage, javaTitle, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                        new String[]{
-                                messages.getString("java.system.choice"),
-                                "OK"
-                        }, 1);
-                if (result == 1 || result == JOptionPane.CLOSED_OPTION) {
-                    // the user selected XMage java version
-                    Config.getInstance().setUseSystemJava(false);
-                    noJava = Config.getInstance().getInstalledJavaVersion().isEmpty();
-                    if (noJava)
-                    {
-                        disableButtons(true);
-                    }
-                } else if (result == 0) {
-                    // the user selected the system java version
-                    if (checkJavaFX()) {
-                        textArea.append(messages.getString("java.installed") + System.getProperty("java.home") + "\n");
-                        noJava = false;
-                        Config.getInstance().setUseSystemJava(true);
-                    } else {
-                        JOptionPane.showMessageDialog(frame, messages.getString("java.system.nojavafx.message"),
-                                messages.getString("java.system.nojavafx"),
-                                JOptionPane.ERROR_MESSAGE);
-                        Config.getInstance().setUseSystemJava(false);
-                    }
-                }
-                Config.getInstance().saveProperties();
-            }
-        } catch (JSONException ex) {
-            logger.error("Error: ", ex);
-        }
-    }
-
     private void checkXMage(boolean silent) {
         try {
             String xmageAvailableVersion = (String) config.getJSONObject("XMage").get(("version"));
@@ -577,7 +486,6 @@ public class XMageLauncher implements Runnable {
             textArea.append(messages.getString("xmage.available") + xmageAvailableVersion + "\n");
             noXMage = false;
             newXMage = false;
-            downgradeXMage = false;
             int compared = compareVersions(xmageAvailableVersion, xmageInstalledVersion);
             if (compared > 0) {
                 newXMage = true;
@@ -597,16 +505,13 @@ public class XMageLauncher implements Runnable {
                     JOptionPane.showMessageDialog(frame, xmageMessage, xmageTitle, JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-            if (compared < 0) { // handle downgrade
-                downgradeXMage = true;
-            }
         } catch (JSONException ex) {
             logger.error("Error: ", ex);
         }
     }
 
     private void enableButtons() {
-        if (!noJava && !noXMage) {
+        if (!noXMage) {
             btnLaunchClient.setEnabled(true);
             btnLaunchClient.setForeground(Color.BLACK);
             btnLaunchClientServer.setEnabled(true);
@@ -711,58 +616,13 @@ public class XMageLauncher implements Runnable {
 
         @Override
         protected Void doInBackground() {
-            if (!downgradeXMage && (force || noJava || newJava)) { // only update java on force update to the same version
-                updateJava();
-            }
             if (force || noXMage || newXMage) {
                 updateXMage();
             }
             return null;
         }
 
-        private boolean updateJava() {
-            if (Config.getInstance().useSystemJava()) {
-                publish(messages.getString("java.system.message") + " " + System.getProperty("java.home") + "\n");
-                return true;
-            } else {
-                try {
-                    disableButtons();
-                    File javaFolder = new File(path.getAbsolutePath() + File.separator + "java");
-                    String javaAvailableVersion = (String) config.getJSONObject("java").get(("version"));
-                    if (javaFolder.isDirectory()) { // remove existing install
-                        publish(messages.getString("removing") + "\n");
-                        removeJavaFiles(javaFolder);
-                    }
-                    javaFolder.mkdirs();
-                    String javaRemoteLocation = (String) config.getJSONObject("java").get(("location"));
-                    URL java = new URL(javaRemoteLocation + Utilities.getOSandArch() + ".tar.gz");
-                    publish(messages.getString("java.downloading") + java + "\n");
-
-                    download(java, path.getAbsolutePath(), "oraclelicense=accept-securebackup-cookie");
-
-                    File from = new File(path.getAbsolutePath() + File.separator + "xmage.dl");
-                    publish(messages.getString("java.installing"));
-
-                    extract(from, javaFolder);
-                    publish(messages.getString("done") + "\n");
-                    publish(0);
-                    if (!from.delete()) {
-                        publish(messages.getString("error.cleanup") + "\n");
-                        logger.error("Error: could not cleanup temporary files");
-                    }
-                    Config.getInstance().setInstalledJavaVersion(javaAvailableVersion);
-                    Config.getInstance().saveProperties();
-                    return true;
-                } catch (IOException | JSONException ex) {
-                    publish(0);
-                    cancel(true);
-                    logger.error("Error: ", ex);
-                }
-            }
-            return false;
-        }
-
-        private boolean updateXMage() {
+        private void updateXMage() {
             try {
                 disableButtons();
                 File xmageFolder = new File(path.getAbsolutePath() + File.separator + "xmage");
@@ -807,25 +667,11 @@ public class XMageLauncher implements Runnable {
                     }
                     Config.getInstance().setInstalledXMageVersion(xmageAvailableVersion);
                     Config.getInstance().saveProperties();
-                    return true;
                 }
             } catch (IOException | JSONException ex) {
                 publish(0);
                 cancel(true);
                 logger.error("Error: ", ex);
-            }
-            return false;
-        }
-
-        private void removeJavaFiles(File javaFolder) {
-            File[] files = javaFolder.listFiles();
-            for (final File file : files) {
-                if (file.isDirectory()) {
-                    removeJavaFiles(file);
-                }
-                if (!file.delete()) {
-                    logger.error("Can't remove " + file.getAbsolutePath());
-                }
             }
         }
 

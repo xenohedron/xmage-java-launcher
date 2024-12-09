@@ -40,7 +40,6 @@ public class Config {
     };
 
     private String version = "";
-    private String installedJavaVersion = "";
     private String installedXMageVersion = "";
     private String homeURL = BETA_URL;
     private String clientJavaOpts = DEFAULT_CLIENT_JAVA_OPTS;
@@ -48,7 +47,6 @@ public class Config {
     private int guiSize = getScreenDPI() / 6;
     private boolean showClientConsole = true;
     private boolean showServerConsole = true;
-    private boolean useSystemJava = false;
     private boolean serverTestMode = false;
     private int clientStartDelaySeconds = 3;
 
@@ -65,8 +63,7 @@ public class Config {
             }
             try (FileInputStream in = new FileInputStream(properties)) {
                 props.load(in);
-                this.installedJavaVersion = props.getProperty("java.version", this.installedJavaVersion);
-                this.installedXMageVersion = props.getProperty("xmage.version", this.installedJavaVersion);
+                this.installedXMageVersion = props.getProperty("xmage.version", this.installedXMageVersion);
                 if (!reset) {
                     this.clientJavaOpts = props.getProperty("xmage.client.javaopts", this.clientJavaOpts);
                     this.serverJavaOpts = props.getProperty("xmage.server.javaopts", this.serverJavaOpts);
@@ -77,7 +74,6 @@ public class Config {
                     this.homeURL = props.getProperty("xmage.home", this.homeURL);
                     this.showClientConsole = Boolean.parseBoolean(props.getProperty("xmage.client.console", Boolean.toString(this.showClientConsole)));
                     this.showServerConsole = Boolean.parseBoolean(props.getProperty("xmage.server.console", Boolean.toString(this.showServerConsole)));
-                    this.useSystemJava = Boolean.parseBoolean(props.getProperty("xmage.java.usesystem", Boolean.toString(this.useSystemJava)));
                     this.serverTestMode = Boolean.parseBoolean(props.getProperty("xmage.server.testmode", Boolean.toString(this.serverTestMode)));
                     this.clientStartDelaySeconds = Integer.parseInt(props.getProperty("xmage.launcher.client.start.delay", String.valueOf(this.clientStartDelaySeconds)));
                 }
@@ -88,10 +84,6 @@ public class Config {
     }
 
     // Getters
-
-    public String getInstalledJavaVersion() {
-        return this.installedJavaVersion;
-    }
 
     private int getScreenDPI() {
         int result = 0;
@@ -170,10 +162,6 @@ public class Config {
         return this.xMageBranches[this.xMageBranches.length - 1]; // Custom
     }
 
-    public boolean useSystemJava() {
-        return this.useSystemJava;
-    }
-
     public boolean isServerTestMode() {
         return this.serverTestMode;
     }
@@ -187,10 +175,6 @@ public class Config {
     }
 
     // Setters
-
-    public void setInstalledJavaVersion(String version) {
-        this.installedJavaVersion = version;
-    }
 
     public void setInstalledXMageVersion(String version) {
         this.installedXMageVersion = version;
@@ -220,10 +204,6 @@ public class Config {
         this.showServerConsole = show;
     }
 
-    public void setUseSystemJava(boolean b) {
-        this.useSystemJava = b;
-    }
-
     public void setServerTestMode(boolean serverTestMode) {
         this.serverTestMode = serverTestMode;
     }
@@ -235,7 +215,6 @@ public class Config {
     public void saveProperties() {
         File properties = new File(getInstallPath(), PROPERTIES_FILE);
         try (final FileOutputStream out = new FileOutputStream(properties)) {
-            props.setProperty("java.version", installedJavaVersion);
             props.setProperty("xmage.version", installedXMageVersion);
             props.setProperty("xmage.client.javaopts", clientJavaOpts);
             props.setProperty("xmage.server.javaopts", serverJavaOpts);
@@ -243,7 +222,6 @@ public class Config {
             props.setProperty("xmage.home", homeURL);
             props.setProperty("xmage.client.console", Boolean.toString(showClientConsole));
             props.setProperty("xmage.server.console", Boolean.toString(showServerConsole));
-            props.setProperty("xmage.java.usesystem", Boolean.toString(useSystemJava));
             props.setProperty("xmage.server.testmode", Boolean.toString(serverTestMode));
             props.setProperty("xmage.launcher.client.start.delay", Integer.toString(clientStartDelaySeconds));
             props.store(out, "---XMage Properties---");
