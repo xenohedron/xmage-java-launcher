@@ -146,7 +146,7 @@ public class SettingsDialog extends JDialog {
         constraints.fill = GridBagConstraints.NONE;
         panel1.add(label, constraints);
 
-        SpinnerModel clientStartDelayModel = new SpinnerNumberModel(Config.getInstance().getClientStartDelaySeconds(), 0, 1000, 1);
+        SpinnerModel clientStartDelayModel = new SpinnerNumberModel(Config.getInstance().getClientStartDelaySeconds(), 0, 90, 1);
         spnClientDelay = new JSpinner(clientStartDelayModel);
         spnClientDelay.setToolTipText(tip);
         spnClientDelay.setValue(Config.getInstance().getClientStartDelaySeconds());

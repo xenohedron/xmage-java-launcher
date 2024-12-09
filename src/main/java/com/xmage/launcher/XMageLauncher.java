@@ -76,9 +76,7 @@ public class XMageLauncher implements Runnable {
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(XMageLauncher.class.getResource("/icon-mage-flashed.png")));
         frame.setIconImage(icon.getImage());
 
-        Random r = new Random();
-        int imageNum = 1 + r.nextInt(17);
-        ImageIcon background = new ImageIcon(new ImageIcon(Objects.requireNonNull(XMageLauncher.class.getResource("/backgrounds/" + imageNum + ".jpg"))).getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        ImageIcon background = new ImageIcon(new ImageIcon(Objects.requireNonNull(XMageLauncher.class.getResource("/backgrounds/background.png"))).getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH));
         mainPanel = new JLabel(background) {
             @Override
             public Dimension getPreferredSize() {
@@ -304,30 +302,9 @@ public class XMageLauncher implements Runnable {
         toolBar.add(toolbarButton);
         toolBar.addSeparator();
 
-        toolbarButton = new JButton("About");
+        toolbarButton = new JButton("GitHub");
         toolbarButton.setBorder(emptyBorder);
-        toolbarButton.addActionListener(e -> {
-            AboutDialog about = new AboutDialog();
-            about.setVisible(true);
-        });
-        toolBar.add(toolbarButton);
-        toolBar.addSeparator();
-
-        toolbarButton = new JButton("Forum");
-        toolbarButton.setBorder(emptyBorder);
-        toolbarButton.addActionListener(e -> openWebpage("http://www.slightlymagic.net/forum/viewforum.php?f=70"));
-        toolBar.add(toolbarButton);
-        toolBar.addSeparator();
-
-        toolbarButton = new JButton("Website");
-        toolbarButton.setBorder(emptyBorder);
-        toolbarButton.addActionListener(e -> openWebpage("http://xmage.today"));
-        toolBar.add(toolbarButton);
-        toolBar.addSeparator();
-
-        toolbarButton = new JButton("Changelog");
-        toolbarButton.setBorder(emptyBorder);
-        toolbarButton.addActionListener(e -> openWebpage("https://jaydi85.github.io/xmage-web-news/news.html"));
+        toolbarButton.addActionListener(e -> openWebpage("https://github.com/magefree/mage"));
         toolBar.add(toolbarButton);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
@@ -486,7 +463,13 @@ public class XMageLauncher implements Runnable {
     }
 
     private boolean getConfig() {
-        String xmageConfig = Config.getInstance().getXMageHome() + "/config.json";
+        String xmageConfig = Config.getInstance().getXMageHome();
+        if (!xmageConfig.endsWith(".json")) {
+            if (!xmageConfig.endsWith("/")) {
+                xmageConfig += "/";
+            }
+            xmageConfig += "config.json";
+        }
 
         try {
             URL xmageUrl = new URL(xmageConfig);

@@ -15,9 +15,9 @@ import static com.xmage.launcher.Utilities.getInstallPath;
 public class Config {
     private static final String PROPERTIES_FILE = "installed.properties";
     private static final String VERSION_FILE = "/version.properties";
-    private static final String BETA_URL = "http://xmage.today";
-    private static final String DEFAULT_CLIENT_JAVA_OPTS = "-Xmx1000m -Dfile.encoding=UTF-8";
-    private static final String DEFAULT_SERVER_JAVA_OPTS = "-Xmx500m";
+    private static final String BETA_URL = "https://xmage.today/config.json";
+    private static final String DEFAULT_CLIENT_JAVA_OPTS = "-Xmx2G -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8 --add-opens=java.base/java.io=ALL-UNNAMED";
+    private static final String DEFAULT_SERVER_JAVA_OPTS = "-Xmx1G --add-opens=java.base/java.io=ALL-UNNAMED";
 
     // Singleton
     private static Config currentConfig = new Config(false);
@@ -34,7 +34,8 @@ public class Config {
     // Configs
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(Config.class);
     private final XMageBranch[] xMageBranches = new XMageBranch[]{
-            new XMageBranch("Beta", BETA_URL),
+            new XMageBranch("Official beta release (JayDi)", BETA_URL),
+            new XMageBranch("Automated weekly (Grath)", "https://grath.github.io/config.json"),
             new XMageBranch("Custom", null)
     };
 
@@ -49,7 +50,7 @@ public class Config {
     private boolean showServerConsole = true;
     private boolean useSystemJava = false;
     private boolean serverTestMode = false;
-    private int clientStartDelaySeconds = 2;
+    private int clientStartDelaySeconds = 3;
 
     private final Properties props = new Properties();
 
