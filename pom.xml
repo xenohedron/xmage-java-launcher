@@ -5,7 +5,7 @@
     <groupId>com.xmage</groupId>
     <artifactId>Launcher</artifactId>
     <packaging>jar</packaging>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
     <name>XMage Launcher</name>
     <description>XMage allows you to play Magic against one or more online players or computer opponents</description>
 
@@ -35,7 +35,7 @@
     <properties>
         <java.version>1.8</java.version>
         <finalproject.name>XMageLauncher-${project.version}</finalproject.name>
-        <version>0.4.1</version>
+        <version>0.4.2</version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
