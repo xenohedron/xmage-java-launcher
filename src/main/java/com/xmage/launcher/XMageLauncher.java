@@ -29,18 +29,14 @@ public class XMageLauncher implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(XMageLauncher.class);
 
     private final ResourceBundle messages;
-    private final Locale locale;
 
     private final JFrame frame;
     private final JLabel mainPanel;
-    private final JLabel labelProgress;
     private final JProgressBar progressBar;
     private final JTextArea textArea;
     private final JButton btnLaunchClient;
-    private final JLabel xmageLogo;
     private final JButton btnLaunchServer;
     private final JButton btnLaunchClientServer;
-    private final JScrollPane scrollPane;
     private final JButton btnCheck;
     private final JButton btnUpdate;
 
@@ -53,9 +49,6 @@ public class XMageLauncher implements Runnable {
     private final List<Process> clientProcesses = new LinkedList<>();
     private final XMageConsole serverConsole;
     private final XMageConsole clientConsole;
-
-    private JToolBar toolBar;
-
     private boolean newJava = false;
     private boolean noJava = false;
     private boolean newXMage = false;
@@ -64,8 +57,7 @@ public class XMageLauncher implements Runnable {
 
     private XMageLauncher() {
         setDefaultFonts();
-        locale = Locale.getDefault();
-        //locale = new Locale("it", "IT");
+        Locale locale = Locale.getDefault();
         messages = ResourceBundle.getBundle("MessagesBundle", locale);
         localize();
 
@@ -117,9 +109,7 @@ public class XMageLauncher implements Runnable {
                 int yMoved = (thisY + e.getY()) - (thisY + grabPoint.y);
 
                 // Move window to this position
-                int X = thisX + xMoved;
-                int Y = thisY + yMoved;
-                frame.setLocation(X, Y);
+                frame.setLocation(thisX + xMoved, thisY + yMoved);
             }
         });
         mainPanel.setLayout(new GridBagLayout());
@@ -134,7 +124,7 @@ public class XMageLauncher implements Runnable {
         mainPanel.add(Box.createRigidArea(new Dimension(250, 50)));
 
         ImageIcon logo = new ImageIcon(new ImageIcon(Objects.requireNonNull(XMageLauncher.class.getResource("/label-xmage.png"))).getImage().getScaledInstance(150, 75, Image.SCALE_SMOOTH));
-        xmageLogo = new JLabel(logo);
+        JLabel xmageLogo = new JLabel(logo);
         constraints.gridx = 3;
         constraints.gridy = 0;
         constraints.gridheight = 1;
@@ -148,9 +138,9 @@ public class XMageLauncher implements Runnable {
         textArea.setBackground(Color.BLACK);
         DefaultCaret caret = (DefaultCaret) textArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        scrollPane = new JScrollPane(textArea);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         constraints.gridx = 2;
         constraints.gridy = 1;
         constraints.weightx = 1.0;
@@ -158,7 +148,7 @@ public class XMageLauncher implements Runnable {
         constraints.fill = GridBagConstraints.BOTH;
         mainPanel.add(scrollPane, constraints);
 
-        labelProgress = new JLabel(messages.getString("progress"));
+        JLabel labelProgress = new JLabel(messages.getString("progress"));
         labelProgress.setFont(fontSmall);
         labelProgress.setForeground(Color.WHITE);
         constraints.gridy = 2;
@@ -190,7 +180,6 @@ public class XMageLauncher implements Runnable {
         btnLaunchClient.setFont(fontBig);
         btnLaunchClient.setForeground(Color.GRAY);
         btnLaunchClient.setEnabled(false);
-//        btnLaunchClient.setPreferredSize(new Dimension(180, 60));
         btnLaunchClient.addActionListener(e -> handleClient());
 
         constraints.gridx = GridBagConstraints.RELATIVE;
@@ -204,7 +193,6 @@ public class XMageLauncher implements Runnable {
         btnLaunchClientServer.setFont(fontSmallBold);
         btnLaunchClientServer.setEnabled(false);
         btnLaunchClientServer.setForeground(Color.GRAY);
-//        btnLaunchClientServer.setPreferredSize(new Dimension(80, 40));
         btnLaunchClientServer.addActionListener(e -> {
             handleServer();
             if (serverProcess != null) {
@@ -223,7 +211,6 @@ public class XMageLauncher implements Runnable {
         btnLaunchServer.setFont(fontSmallBold);
         btnLaunchServer.setEnabled(false);
         btnLaunchServer.setForeground(Color.GRAY);
-//        btnLaunchServer.setPreferredSize(new Dimension(80, 40));
         btnLaunchServer.addActionListener(e -> handleServer());
 
         pnlButtons.add(btnLaunchServer, constraints);
@@ -232,7 +219,6 @@ public class XMageLauncher implements Runnable {
         btnUpdate.setToolTipText(messages.getString("update.xmage.tooltip"));
         btnUpdate.setFont(fontSmallBold);
         btnUpdate.setForeground(Color.BLACK);
-//        btnUpdate.setPreferredSize(new Dimension(80, 40));
         btnUpdate.setEnabled(true);
 
         btnUpdate.addActionListener(e -> handleUpdate());
@@ -243,7 +229,6 @@ public class XMageLauncher implements Runnable {
         btnCheck.setToolTipText(messages.getString("check.xmage.tooltip"));
         btnCheck.setFont(fontSmallBold);
         btnCheck.setForeground(Color.BLACK);
-//        btnCheck.setPreferredSize(new Dimension(80, 40));
         btnCheck.setEnabled(true);
 
         btnCheck.addActionListener(e -> handleCheckUpdates());
@@ -293,6 +278,7 @@ public class XMageLauncher implements Runnable {
     }
 
     private void createToolbar() {
+        JToolBar toolBar;
 
         toolBar = new JToolBar();
         toolBar.setFloatable(false);
@@ -301,7 +287,7 @@ public class XMageLauncher implements Runnable {
         JButton toolbarButton = new JButton("Settings");
         toolbarButton.setBorder(emptyBorder);
         toolbarButton.addActionListener(e -> {
-            SettingsDialog settings = new SettingsDialog(messages);
+            SettingsDialog settings = new SettingsDialog();
             settings.setVisible(true);
             settings.addWindowListener(new WindowAdapter() {
                 @Override
@@ -415,7 +401,7 @@ public class XMageLauncher implements Runnable {
                 btnLaunchClientServer.setEnabled(true);
             }
         }
-        while (clientProcesses.size() > 0) {
+        while (!clientProcesses.isEmpty()) {
             int choice = JOptionPane.showConfirmDialog(frame, messages.getString("update.while.client.open"), messages.getString("update.while.client.open.title"), JOptionPane.OK_CANCEL_OPTION);
             if (choice == JOptionPane.CANCEL_OPTION) {
                 return;

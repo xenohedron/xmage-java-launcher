@@ -1,5 +1,4 @@
 package com.xmage.launcher;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,18 +6,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 /**
  * @author BetaSteward
  */
 public class SettingsDialog extends JDialog {
 
-    private final JTabbedPane tabbedPane;
-    private final JPanel buttonPanel;
-    private final JPanel panel1;
-    private final JPanel panel2;
-    private final JPanel panel3;
     private final JTextField txtClientJavaOpt;
     private final JTextField txtServerJavaOpt;
     private final JTextField txtXMageHome;
@@ -29,11 +22,9 @@ public class SettingsDialog extends JDialog {
     private final JSpinner spnGuiSize;
     private final JSpinner spnClientDelay;
     private final JComboBox<XMageBranch> cmbXMageBranch;
-    private final ResourceBundle messages;
 
 
-    public SettingsDialog(ResourceBundle messages) {
-        this.messages = messages;
+    public SettingsDialog() {
 
         ImageIcon icon = new ImageIcon(Objects.requireNonNull(XMageLauncher.class.getResource("/icon-mage-flashed.png")));
         this.setIconImage(icon.getImage());
@@ -60,7 +51,7 @@ public class SettingsDialog extends JDialog {
         JLabel label;
 
         // Downloads panel
-        panel1 = new JPanel();
+        JPanel panel1 = new JPanel();
         layout = new GridBagLayout();
         layout.columnWeights = new double[]{0, 1.0};
         panel1.setLayout(layout);
@@ -185,7 +176,7 @@ public class SettingsDialog extends JDialog {
         panel1.add(Box.createHorizontalBox(), constraints);
 
         // Java settings panel
-        panel2 = new JPanel();
+        JPanel panel2 = new JPanel();
         layout = new GridBagLayout();
         layout.columnWeights = new double[]{0, 1.0};
         panel2.setLayout(layout);
@@ -231,7 +222,7 @@ public class SettingsDialog extends JDialog {
         panel2.add(txtServerJavaOpt, constraints);
 
         // Launcher settings panel
-        panel3 = new JPanel();
+        JPanel panel3 = new JPanel();
         layout = new GridBagLayout();
         layout.columnWeights = new double[]{0, 1.0};
         panel3.setLayout(layout);
@@ -253,14 +244,14 @@ public class SettingsDialog extends JDialog {
         resetBtn.addActionListener(e -> handleReset());
 
         // Setup tabs
-        tabbedPane = new JTabbedPane();
+        JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("XMage", panel1);
         tabbedPane.addTab("Java", panel2);
         tabbedPane.addTab("Other", panel3);
         add(tabbedPane, BorderLayout.CENTER);
 
         // Button panel
-        buttonPanel = new javax.swing.JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         buttonPanel.add(Box.createHorizontalGlue());
