@@ -572,7 +572,7 @@ public class XMageLauncher implements Runnable {
                         URL launcher = new URL(launcherRemoteLocation);
                         publish(messages.getString("xmage.launcher.downloading") + launcher + "\n");
 
-                        download(launcher, path.getAbsolutePath(), "");
+                        download(launcher, path.getAbsolutePath());
 
                         File from = new File(path.getAbsolutePath() + File.separator + "xmage.dl");
                         publish(messages.getString("xmage.launcher.installing"));
@@ -639,13 +639,13 @@ public class XMageLauncher implements Runnable {
                 publish(messages.getString("xmage.downloading") + xmage + "\n");
 
                 int altCount = 0;
-                boolean result = download(xmage, path.getAbsolutePath(), "");
+                boolean result = download(xmage, path.getAbsolutePath());
                 while (!result && altCount <= otherLocations.length) {
                     publish(messages.getString("xmage.downloading.failed") + xmage + "\n");
                     xmage = new URL(otherLocations[altCount]);
                     altCount++;
                     publish(messages.getString("xmage.downloading") + xmage + "\n");
-                    result = download(xmage, path.getAbsolutePath(), "");
+                    result = download(xmage, path.getAbsolutePath());
                 }
                 if (result) {
                     if (xmageFolder.isDirectory()) { // remove existing install
