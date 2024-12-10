@@ -15,7 +15,7 @@ import static com.xmage.launcher.Utilities.getInstallPath;
 public class Config {
     private static final String PROPERTIES_FILE = "installed.properties";
     private static final String VERSION_FILE = "/version.properties";
-    private static final String BETA_URL = "https://xmage.today/config.json";
+    private static final String BETA_URL = "https://xmage.today/";
     private static final String DEFAULT_CLIENT_JAVA_OPTS = "-Xmx2G -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8 --add-opens=java.base/java.io=ALL-UNNAMED";
     private static final String DEFAULT_SERVER_JAVA_OPTS = "-Xmx1G --add-opens=java.base/java.io=ALL-UNNAMED";
 
@@ -35,7 +35,8 @@ public class Config {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(Config.class);
     private final XMageBranch[] xMageBranches = new XMageBranch[]{
             new XMageBranch("Official beta release (JayDi)", BETA_URL),
-            new XMageBranch("Automated weekly (Grath)", "https://grath.github.io/config.json"),
+            new XMageBranch("Automated weekly (Grath)", "https://grath.github.io/"),
+            new XMageBranch("XDHS maintained (xenohedron)", "https://xdhs.net/xmage/"),
             new XMageBranch("Custom", null)
     };
 
