@@ -163,9 +163,6 @@ public class SettingsDialog extends JDialog {
         SpinnerModel guiSizemodel = new SpinnerNumberModel(Config.getInstance().getGuiSize(), 10, 50, 1);
         spnGuiSize = new JSpinner(guiSizemodel);
         spnGuiSize.setValue(Config.getInstance().getGuiSize());
-//        Component mySpinnerEditor = spnGuiSize.getEditor();
-//        JFormattedTextField jftf = ((JSpinner.DefaultEditor) mySpinnerEditor).getTextField();
-//        jftf.setColumns(10);
         spnGuiSize.setFont(defaultFont);
         constraints.gridwidth = 1;
         constraints.anchor = GridBagConstraints.WEST;

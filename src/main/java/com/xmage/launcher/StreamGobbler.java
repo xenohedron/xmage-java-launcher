@@ -40,13 +40,9 @@ public class StreamGobbler extends Thread {
     }
 
     private void appendLine(final String line) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                text.append(line + "\n"); // JTextArea.append is NOT thread safe, see
-                // http://stackoverflow.com/questions/8436949/thread-safety-of-jtextarea-append
-            }
+        SwingUtilities.invokeLater(() -> {
+            text.append(line + "\n"); // JTextArea.append is NOT thread safe, see
+            // http://stackoverflow.com/questions/8436949/thread-safety-of-jtextarea-append
         });
     }
 }

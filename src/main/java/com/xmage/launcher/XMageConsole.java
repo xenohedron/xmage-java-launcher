@@ -10,7 +10,6 @@ import java.awt.*;
 public class XMageConsole extends JFrame {
 
     private final JTextArea mainPanel;
-    private final JScrollPane scrollPane;
 
     public XMageConsole(String title) {
         setTitle(title);
@@ -20,7 +19,7 @@ public class XMageConsole extends JFrame {
         mainPanel.setBackground(Color.BLACK);
         DefaultCaret caret = (DefaultCaret) mainPanel.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        scrollPane = new JScrollPane(mainPanel) {
+        JScrollPane scrollPane = new JScrollPane(mainPanel) {
             @Override
             public Dimension getPreferredSize() {
                 Dimension size = super.getPreferredSize();
@@ -30,8 +29,8 @@ public class XMageConsole extends JFrame {
                 return size;
             }
         };
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         add(scrollPane);
         setPreferredSize(new Dimension(800, 400));

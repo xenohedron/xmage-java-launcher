@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author BetaSteward
@@ -98,10 +99,9 @@ public class Utilities {
 
     private static Process launchProcess(String main, String args, String path, String javaOpts) {
 
-        File installPath = Utilities.getInstallPath();
         File javaHome = new File(System.getProperty("java.home"));
         File javaBin = new File(javaHome, "/bin/java");
-        File xmagePath = new File(installPath, "/xmage/" + path);
+        File xmagePath = new File(Utilities.getInstallPath(), "/xmage/" + path);
         File classPath = new File(xmagePath, "/lib/*");
 
         if (!javaBin.getParentFile().exists() || !xmagePath.isDirectory()) {
@@ -113,7 +113,7 @@ public class Utilities {
         logger.info("XMage Path: " + xmagePath);
         logger.info("Class Path: " + classPath);
 
-        ArrayList<String> command = new ArrayList<>();
+        List<String> command = new ArrayList<>();
         command.add(javaBin.getAbsolutePath());
         command.addAll(Arrays.asList(javaOpts.split(" ")));
         command.add("-cp");
@@ -129,7 +129,7 @@ public class Utilities {
         try {
             return pb.start();
         } catch (IOException ex) {
-            logger.error("Error staring process", ex);
+            logger.error("Error starting process", ex);
         }
         return null;
     }
