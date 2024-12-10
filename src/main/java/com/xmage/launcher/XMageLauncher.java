@@ -370,12 +370,13 @@ public class XMageLauncher implements Runnable {
                 btnLaunchClientServer.setEnabled(true);
             }
         }
-        while (!clientProcesses.isEmpty()) {
+        clientProcesses.removeIf(p -> !p.isAlive());
+        if (!clientProcesses.isEmpty()) {
             int choice = JOptionPane.showConfirmDialog(frame, messages.getString("update.while.client.open"), messages.getString("update.while.client.open.title"), JOptionPane.OK_CANCEL_OPTION);
             if (choice == JOptionPane.CANCEL_OPTION) {
                 return;
             }
-            clientProcesses.removeIf(p -> !p.isAlive());
+            clientProcesses.forEach(Utilities::stopProcess);
         }
         disableButtons();
         if (!getConfig()) {
@@ -384,16 +385,12 @@ public class XMageLauncher implements Runnable {
         checkXMage(true); // handle branch changes
         if (!newXMage) {
             int response = JOptionPane.showConfirmDialog(frame, messages.getString("force.update.message"), messages.getString("force.update.title"), JOptionPane.YES_NO_OPTION);
-            if (response == JOptionPane.YES_OPTION) {
-                UpdateTask update = new UpdateTask(progressBar, true);
-                update.execute();
-            } else {
+            if (response != JOptionPane.YES_OPTION) {
                 enableButtons();
+                return;
             }
-        } else {
-            UpdateTask update = new UpdateTask(progressBar, false);
-            update.execute();
         }
+        new UpdateTask(progressBar).execute();
     }
 
     private void handleCheckUpdates() {
@@ -502,7 +499,12 @@ public class XMageLauncher implements Runnable {
                     xmageTitle = messages.getString("xmage.new");
                 }
                 if (!silent) {
-                    JOptionPane.showMessageDialog(frame, xmageMessage, xmageTitle, JOptionPane.INFORMATION_MESSAGE);
+                    int response = JOptionPane.showConfirmDialog(frame, xmageMessage, xmageTitle, JOptionPane.YES_NO_OPTION);
+                    if (response == JOptionPane.YES_OPTION) {
+                        new UpdateTask(progressBar).execute();
+                    } else {
+                        enableButtons();
+                    }
                 }
             }
         } catch (JSONException ex) {
@@ -597,28 +599,19 @@ public class XMageLauncher implements Runnable {
         @Override
         public void done() {
             checkUpdates();
-            if (noXMage) {
-                UpdateTask update = new UpdateTask(progressBar, false);
-                update.execute();
-            }
         }
 
     }
 
     private class UpdateTask extends DownloadTask {
 
-        private final boolean force;
-
-        public UpdateTask(JProgressBar progressBar, boolean force) {
+        public UpdateTask(JProgressBar progressBar) {
             super(progressBar, textArea);
-            this.force = force;
         }
 
         @Override
         protected Void doInBackground() {
-            if (force || noXMage || newXMage) {
-                updateXMage();
-            }
+            updateXMage();
             return null;
         }
 
